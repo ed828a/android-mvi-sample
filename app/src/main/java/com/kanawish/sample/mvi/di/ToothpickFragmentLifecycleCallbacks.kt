@@ -1,9 +1,9 @@
 package com.kanawish.sample.mvi.di
 
 import android.content.Context
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentManager.FragmentLifecycleCallbacks
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 import toothpick.Toothpick
 
 /**
@@ -12,11 +12,11 @@ import toothpick.Toothpick
  * - `onFragmentDetached` will close the sub-scope.
  */
 class ToothpickFragmentLifecycleCallbacks : FragmentLifecycleCallbacks() {
-    override fun onFragmentPreAttached(fm: FragmentManager?, f: Fragment?, context: Context?) {
-        f?.let { fragment -> Toothpick.inject(fragment, Toothpick.openScopes(context, fragment)) }
+    override fun onFragmentPreAttached(fm: FragmentManager, fragment:Fragment, context: Context) {
+        Toothpick.inject(fragment, Toothpick.openScopes(context, fragment))
     }
 
-    override fun onFragmentDetached(fm: FragmentManager?, f: Fragment?) {
-        f?.let { fragment -> Toothpick.closeScope(fragment) }
+    override fun onFragmentDetached(fm: FragmentManager, fragment: Fragment) {
+         Toothpick.closeScope(fragment)
     }
 }
