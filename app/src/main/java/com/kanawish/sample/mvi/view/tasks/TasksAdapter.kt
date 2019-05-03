@@ -16,7 +16,7 @@ import io.reactivex.rxkotlin.plusAssign
 import javax.inject.Inject
 
 class TasksAdapter @Inject constructor(
-        private val llayoutInflater: LayoutInflater,
+        private val layoutInflater: LayoutInflater,
         private val tasksIntent: TasksIntentFactory,
         private val tasksModelStore: TasksModelStore
 ) : RecyclerView.Adapter<TaskViewHolder>(),
@@ -29,7 +29,8 @@ class TasksAdapter @Inject constructor(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
+//        val view = LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
+        val view = layoutInflater.inflate(R.layout.task_item, parent, false)
 
         return TaskViewHolder(view).apply {
             events().subscribe(tasksIntent::process)
