@@ -7,18 +7,46 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
-import kotlinx.android.synthetic.main.addtask_act.fab_edit_task_done
+import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
+import com.kanawish.sample.mvi.model.TaskEditorModelStore
+import com.kanawish.sample.mvi.model.TaskEditorState
+import com.kanawish.sample.mvi.model.TasksModelStore
+import com.kanawish.sample.mvi.view.EventObservable
+import com.kanawish.sample.mvi.view.StateSubscriber
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.ofType
+import io.reactivex.rxkotlin.plusAssign
+import kotlinx.android.synthetic.main.addtask_frag.*
+import javax.inject.Inject
 
 /**
  * Fragment for adding/editing tasks.
  */
-class AddEditTaskFragment : Fragment() {
+class AddEditTaskFragment : Fragment(),
+        StateSubscriber<TaskEditorState>,
+        EventObservable<AddEditTaskViewEvent> {
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        fab_edit_task_done?.apply {
-            setImageResource(R.drawable.ic_done)
+    @Inject lateinit var editorModelStore: TaskEditorModelStore
+    @Inject lateinit var intentFactory: AddEditTaskIntentFactory
+
+    private val disposables = CompositeDisposable()
+
+    override fun events(): Observable<AddEditTaskViewEvent> {
+        return Observable.merge(
+                add_task_title.textChanges().map { AddEditTaskViewEvent.TitleChange(it.toString()) },
+                add_task_description.textChanges().map { AddEditTaskViewEvent.DescriptionChanged(it.toString()) }
+        )
+    }
+
+    override fun Observable<TaskEditorState>.subscribeToState(): Disposable {
+        // return ofType(TaskEditorState.Editing::class.java).firstElement().subscribe {editing
+        return ofType<TaskEditorState.Editing>().firstElement().subscribe {editing ->
+            add_task_title.setText(editing.task.title)
+            add_task_description.setText(editing.task.description)
         }
     }
 
@@ -31,4 +59,14 @@ class AddEditTaskFragment : Fragment() {
         inflater.inflate(R.menu.addtask_fragment_menu, menu)
     }
 
+    override fun onResume() {
+        super.onResume()
+        disposables += editorModelStore.modelState().subscribeToState()
+        disposables += events().subscribe(intentFactory::process)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        disposables.clear()
+    }
 }
