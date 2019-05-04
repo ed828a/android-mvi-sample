@@ -42,20 +42,23 @@ class AddEditTaskActivity : AppCompatActivity(),
     private val disposables = CompositeDisposable()
 
     override fun Observable<TaskEditorState>.subscribeToState(): Disposable {
-        return CompositeDisposable().also { innerdisposables ->
+        return CompositeDisposable().also { innerDisposables ->
             // logging
-            innerdisposables += subscribe { Timber.i("$it")}
+            innerDisposables += subscribe { Timber.i("$it")}
             // Reactive UX
-            innerdisposables += subscribe {
+
+            innerDisposables += subscribe {
+                Timber.i("TaskEditorState: $it")
                 when(it){
                     is TaskEditorState.Editing -> {
                         fab_edit_task_done.isEnabled = true
                         busy.visibility = View.GONE
                     }
 
-                    is TaskEditorState.Saving, is TaskEditorState.Deleting -> {
+                    is TaskEditorState.Saving,
+                    is TaskEditorState.Deleting -> {
                         invalidateOptionsMenu()
-                        fab_edit_task_done.isEnabled = true
+                        fab_edit_task_done.isEnabled = false
                         busy.visibility = View.VISIBLE
                     }
 

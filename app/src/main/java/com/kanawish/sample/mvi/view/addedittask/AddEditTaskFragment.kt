@@ -1,18 +1,13 @@
 package com.kanawish.sample.mvi.view.addedittask
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TaskEditorState
-import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.view.EventObservable
 import com.kanawish.sample.mvi.view.StateSubscriber
 import io.reactivex.Observable
@@ -38,7 +33,7 @@ class AddEditTaskFragment : Fragment(),
     override fun events(): Observable<AddEditTaskViewEvent> {
         return Observable.merge(
                 add_task_title.textChanges().map { AddEditTaskViewEvent.TitleChange(it.toString()) },
-                add_task_description.textChanges().map { AddEditTaskViewEvent.DescriptionChanged(it.toString()) }
+                add_task_description.textChanges().map { AddEditTaskViewEvent.DescriptionChange(it.toString()) }
         )
     }
 

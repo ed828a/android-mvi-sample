@@ -41,6 +41,7 @@ sealed class TaskEditorState{
     CLOSED --> EDITING: editTask()
 
     EDITING: task
+    EDITING: error?
     EDITING --> EDITING: edit()
 
     EDITING -down-> SAVING: save()

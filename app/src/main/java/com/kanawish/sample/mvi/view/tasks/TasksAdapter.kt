@@ -13,29 +13,43 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
+import timber.log.Timber
 import javax.inject.Inject
 
 class TasksAdapter @Inject constructor(
-        private val layoutInflater: LayoutInflater,
-        private val tasksIntent: TasksIntentFactory,
-        private val tasksModelStore: TasksModelStore
+    private val layoutInflater: LayoutInflater,
+    private val tasksIntent: TasksIntentFactory,
+    private val tasksModelStore: TasksModelStore
 ) : RecyclerView.Adapter<TaskViewHolder>(),
-        StateSubscriber<TasksState> {
+        StateSubscriber<TasksState>
+{
 
     private lateinit var filteredTasks: List<Task>
+    private var disposables = CompositeDisposable()
 
     init {
         setHasStableIds(true)
     }
 
+    override fun Observable<TasksState>.subscribeToState(): Disposable {
+        return this
+//                .map{(tasks, filter) ->
+//                    tasks.filter { task -> filter.filter(task) }
+//                }
+            .map(TasksState::filteredTasks)
+            .distinctUntilChanged()
+            .subscribe { updatedTasks ->
+                filteredTasks = updatedTasks
+                Timber.i("tasks: $filteredTasks")
+                notifyDataSetChanged()
+            }
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
 //        val view = LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
-        val view = layoutInflater.inflate(R.layout.task_item, parent, false)
-
-        return TaskViewHolder(view).apply {
+        val inflatedView = layoutInflater.inflate(R.layout.task_item, parent, false)
+        return TaskViewHolder(inflatedView).apply {
             events().subscribe(tasksIntent::process)
         }
-
     }
 
     override fun getItemCount(): Int = filteredTasks.size
@@ -44,22 +58,9 @@ class TasksAdapter @Inject constructor(
         holder.bind(filteredTasks[position])
     }
 
-    private var disposables = CompositeDisposable()
-
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         disposables += tasksModelStore.modelState().subscribeToState()
-
-    }
-
-    override fun Observable<TasksState>.subscribeToState(): Disposable {
-        return this
-                .map (TasksState::filteredTasks)
-                .distinctUntilChanged()
-                .subscribe { updatedTasks ->
-                    filteredTasks = updatedTasks
-                    notifyDataSetChanged()
-                }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {

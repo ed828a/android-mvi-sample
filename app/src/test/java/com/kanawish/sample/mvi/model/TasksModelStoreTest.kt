@@ -1,21 +1,14 @@
 package com.kanawish.sample.mvi.model
 
 import com.kanawish.sample.mvi.intent.intent
-import com.kanawish.sample.mvi.model.FilterType
-import com.kanawish.sample.mvi.model.SyncState
-import com.kanawish.sample.mvi.model.TasksModelStore
-import com.kanawish.sample.mvi.model.TasksState
 import com.kanawish.sample.mvi.util.ReplaceMainThreadSchedulerRule
-import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
 import toothpick.testing.ToothPickRule
-
 import javax.inject.Inject
 
 class TasksModelStoreTest {
@@ -59,7 +52,7 @@ class TasksModelStoreTest {
         // Process a mock intent
         tasksModelStore.process(intent {
             // simulates a pull to refresh
-            copy(syncState = SyncState.PROCESS(SyncState.PROCESS.Type.REFRESH))
+            copy(syncState = SyncState.PROCESS(SyncState.PROCESS.Type.REFRESH) {})
         })
 
         //we subscribe after this to validate replay works correctly.
@@ -69,7 +62,7 @@ class TasksModelStoreTest {
         testObserver.assertValueCount(1)
         testObserver.values().last().let {
             assert(it.filter == FilterType.ANY)
-            assert(it.syncState == SyncState.PROCESS(SyncState.PROCESS.Type.REFRESH))
+            assert(it.syncState == SyncState.PROCESS(SyncState.PROCESS.Type.REFRESH) {})
         }
 
         // simulate a successful refresh call, that return 1 task.

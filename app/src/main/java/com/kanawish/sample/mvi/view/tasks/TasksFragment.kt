@@ -33,7 +33,9 @@ import javax.inject.Inject
 /**
  * This fragment hold the UI for the list of tasks you can check off.
  */
-class TasksFragment : Fragment(), StateSubscriber<TasksState>, EventObservable<TasksViewEvent> {
+class TasksFragment : Fragment(),
+        StateSubscriber<TasksState>,
+        EventObservable<TasksViewEvent> {
 
     @Inject lateinit var tasksModelStore: TasksModelStore
     @Inject lateinit var tasksAdapter: TasksAdapter

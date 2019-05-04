@@ -20,7 +20,9 @@ import timber.log.Timber
  * you could imagine scenarios where a ViewHolder points to a "live" source of data.
  * In those cases, binding an Observable would be a good approach.
  */
-class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), EventObservable<TasksViewEvent> {
+class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        EventObservable<TasksViewEvent>
+{
 
     private lateinit var currentTask: Task
 

@@ -22,15 +22,18 @@ fun <T> sideEffect(block: T.() -> Unit): Intent<T> = object: Intent<T> {
     override fun reduce(oldState: T): T = oldState.apply(block)
 }
 
-
 fun main(){
+    // Without DSL function, creating an intent like this
     val stringIntentLong = object: Intent<String>{
         override fun reduce(oldState: String): String {
             return oldState.plus("bar")
         }
     }
+
     println(stringIntentLong.reduce("foo"))
 
+    // With DSL, creating an intent like this
     val stringIntentFoo = intent<String> { plus("bar") }
+
     println(stringIntentFoo.reduce("foo"))
 }

@@ -5,11 +5,12 @@ import java.util.*
 /**
  * this main like a unit test
  */
-fun main(){
+fun main() {
     val task = Task(title = "milk", completed = false)
     val updatedTask = task.copy(completed = true)
     println("final result: $updatedTask")
 }
+
 /**
  * Task Model
  */
@@ -30,26 +31,27 @@ enum class FilterType {
     COMPLETE;
 
     fun filter(task: Task): Boolean {
-        return when(this){
+        return when (this) {
             ANY -> true
             ACTIVE -> !task.completed
             COMPLETE -> task.completed
         }
     }
 }
+
 /**
- * Tasks Sync State
+ * State Machine for Tasks Sync State
  */
-sealed class SyncState{
-    object IDLE: SyncState(){
+sealed class SyncState {
+    object IDLE : SyncState() {
         override fun toString(): String = "IDLE"
     }
 
-    data class PROCESS(val type: Type): SyncState(){
-        enum class Type { REFRESH, CREATE, UPDATE}
+    data class PROCESS(val type: Type, val cancel: () -> Unit) : SyncState() {
+        enum class Type { REFRESH, CREATE, UPDATE }
     }
 
-    data class ERROR(val throwable: Throwable): SyncState()
+    data class ERROR(val throwable: Throwable) : SyncState()
 
 }
 
@@ -60,30 +62,31 @@ data class TasksState(
         val tasks: List<Task>,
         val filter: FilterType,
         val syncState: SyncState
-){
-    fun filteredTasks(): List<Task> = tasks.filter{
+) {
+    fun filteredTasks(): List<Task> = tasks.filter {
         filter.filter(it)
     }
 
 }
 
 /*
-    State Diagram for SyncState
+    TasksState Machine:  State Diagram for SyncState
     @startuml
     [*] --> IDLE
-    IDLE -> PROCESS: refresh
+    IDLE --> PROCESS: refresh
 
-    PROCESS -> IDLE: success
-    PROCESS -> ERROR: Failed
+    PROCESS -up-> IDLE: success
+    PROCESS -right-> ERROR: Failed
+    PROCESS: type
 
-    ERROR -> IDLE:reset
+    ERROR --> IDLE: reset
     ERROR:throwable
     @enduml
 
 
     Class diagram for Tasks
     @startuml
-    class Task {
+    class Task << (T, #FF7777) data class>>{
         id: String
         lastUpdate: Long
         title: String
@@ -97,21 +100,21 @@ data class TasksState(
         Error(details)
     }
 
-    class TasksModelState <<(D, orchild) data class>>{
-        tasks:List<Task>
-        filter: FilterType
-        syncState: SyncState
-    }
-
-    enum FilterType {
+    enum FilterType << enum >> {
         ANY
         ACTIVE
         COMPLETE
     }
 
-    TasksModelState*--Task:tasks
-    TasksModelState *-- FilterType:filter
-    TasksModelState *-- SyncState:syncState
+    class TasksState <<(D, #00ff00) data class>>{
+        tasks:List<Task>
+        filter: FilterType
+        syncState: SyncState
+    }
+
+    TasksState *-- Task:tasks
+    TasksState *-- FilterType:filter
+    TasksState *-- SyncState:syncState
 
     @enduml
 

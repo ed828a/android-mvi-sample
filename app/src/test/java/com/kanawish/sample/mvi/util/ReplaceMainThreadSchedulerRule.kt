@@ -8,15 +8,17 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-class ReplaceMainThreadSchedulerRule(
-        val replacementScheduler: Scheduler = Schedulers.trampoline()
-): TestRule {
-    override fun apply(base: Statement?, description: Description?): Statement {
-        return object: Statement(){
+/**
+ * A testing rule allowing us to replace the main-thread scheduler. This is needed to unit test
+ * rx chains that use the main thread.
+ */
+class ReplaceMainThreadSchedulerRule(val replacementScheduler: Scheduler = Schedulers.trampoline()) : TestRule {
+    override fun apply(base: Statement, description: Description): Statement {
+        return object : Statement() {
             override fun evaluate() {
                 RxAndroidPlugins.setInitMainThreadSchedulerHandler { replacementScheduler }
                 try {
-                    base?.evaluate()
+                    base.evaluate()
                 } finally {
                     RxJavaPlugins.reset()
                 }

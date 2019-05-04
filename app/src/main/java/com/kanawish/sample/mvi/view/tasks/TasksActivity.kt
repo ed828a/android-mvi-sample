@@ -30,7 +30,8 @@ import javax.inject.Inject
  */
 class TasksActivity : AppCompatActivity(),
         StateSubscriber<TaskEditorState>,
-        EventObservable<TasksViewEvent> {
+        EventObservable<TasksViewEvent>
+{
     // Note: We connect to _editor_model here
     @Inject
     lateinit var editorModelStore: TaskEditorModelStore
@@ -42,13 +43,6 @@ class TasksActivity : AppCompatActivity(),
     private val disposables = CompositeDisposable()
 
     /**
-     * TasksActivity owns the Floating Action Button, and is the source for 'TasksViewEvent.NewTaskClick' events
-     */
-    override fun events(): Observable<TasksViewEvent> {
-        return newTaskFloatingActionButton.clicks().map { TasksViewEvent.NewTaskClick }
-    }
-
-    /**
      * TasksActivity starts the AddEditTaskActivity when it detects the 'TaskEditorStore' has transitioned to a 'TaskEditorState.Editing' state
      */
     override fun Observable<TaskEditorState>.subscribeToState(): Disposable {
@@ -57,6 +51,14 @@ class TasksActivity : AppCompatActivity(),
             val intent = Intent(this@TasksActivity, AddEditTaskActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    /**
+     * TasksActivity owns the Floating Action Button, and is the source for
+     * 'TasksViewEvent.NewTaskClick' events
+     */
+    override fun events(): Observable<TasksViewEvent> {
+        return newTaskFloatingActionButton.clicks().map { TasksViewEvent.NewTaskClick }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,9 +105,8 @@ class TasksActivity : AppCompatActivity(),
         return navView.itemSelections().subscribe { menuItem ->
             when (menuItem.itemId) {
                 R.id.statistics_navigation_menu_item -> {
-                    Intent(this@TasksActivity, StatisticsActivity::class.java).also {
-                        startActivity(it)
-                    }
+                    Intent(this@TasksActivity, StatisticsActivity::class.java)
+                            .also { startActivity(it) }
                 }
             }
             menuItem.isChecked = true
