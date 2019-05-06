@@ -4,7 +4,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * to store TasksState Model
+ * to store TasksState Model with the initial values
+ * this class is Singleton for the whole app, and is available for injection
+ *
  */
 @Singleton
 class TasksModelStore @Inject constructor() : ModelStore<TasksState>(

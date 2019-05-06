@@ -86,7 +86,7 @@ class TasksActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-
+        // wire up
         disposables += events().subscribe(tasksIntentFactory::process)
         disposables += editorModelStore.modelState().subscribeToState()
         disposables += subscribeNavigationHandling()
@@ -95,7 +95,7 @@ class TasksActivity : AppCompatActivity(),
 
     override fun onPause() {
         super.onPause()
-
+        // tear down
         disposables.clear()
     }
 

@@ -6,8 +6,11 @@ import java.util.*
  * this main like a unit test
  */
 fun main() {
-    val task = Task(title = "milk", completed = false)
+    val task = Task(title = "Milk", completed = false)
+    // Want to check off milk from the list?
     val updatedTask = task.copy(completed = true)
+    // That's all there is to it.
+
     println("final result: $updatedTask")
 }
 
@@ -45,13 +48,18 @@ enum class FilterType {
 sealed class SyncState {
     object IDLE : SyncState() {
         override fun toString(): String = "IDLE"
+        fun refresh() = PROCESS(PROCESS.Type.REFRESH) {}
     }
 
     data class PROCESS(val type: Type, val cancel: () -> Unit) : SyncState() {
         enum class Type { REFRESH, CREATE, UPDATE }
+        fun success() = IDLE
+        fun failed() = ERROR(Throwable("Operation Failed."))
     }
 
-    data class ERROR(val throwable: Throwable) : SyncState()
+    data class ERROR(val throwable: Throwable) : SyncState(){
+        fun reset() = IDLE
+    }
 
 }
 

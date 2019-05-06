@@ -45,8 +45,8 @@ class AddEditTaskActivity : AppCompatActivity(),
         return CompositeDisposable().also { innerDisposables ->
             // logging
             innerDisposables += subscribe { Timber.i("$it")}
-            // Reactive UX
 
+            // Reactive UX
             innerDisposables += subscribe {
                 Timber.i("TaskEditorState: $it")
                 when(it){

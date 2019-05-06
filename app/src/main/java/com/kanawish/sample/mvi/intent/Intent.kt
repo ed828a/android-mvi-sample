@@ -1,5 +1,7 @@
 package com.kanawish.sample.mvi.intent
 
+import com.kanawish.sample.mvi.model.TaskEditorState
+
 interface Intent<T> {
     fun reduce(oldState: T): T
 }
@@ -11,6 +13,9 @@ interface Intent<T> {
  */
 fun <T> intent(block: T.() -> T): Intent<T> = object: Intent<T> {
     override fun reduce(oldState: T): T = block(oldState)
+     // as the test example
+    // reduce(oldState: TaskEditorState): TaskEditorState = (this as? TaskEditorState.Closed)?.addTask(taskToBeAdded) ?: throw IllegalStateException("Something went wrong")
+
 }
 
 /**

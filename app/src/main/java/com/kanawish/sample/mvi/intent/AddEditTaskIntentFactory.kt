@@ -67,6 +67,8 @@ import javax.inject.Singleton
     companion object {
         /**
          * Creates an intent for the TaskEditor State Machine
+         *
+         * (this as? S) to make sure the action is operated under the right State.
          */
         inline fun <reified S: TaskEditorState> editorIntent (
                 crossinline block: S.() -> TaskEditorState

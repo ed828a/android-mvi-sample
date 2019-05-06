@@ -3,7 +3,7 @@ package com.kanawish.sample.mvi.view.addedittask
 
 /**
  * Events can be defined in a sealed class.
- * for events without data, we can define them as each object.
+ * for events without data, we can define them as object for each.
  * for events with data, we define them as data class.
  * it's same rules for State Machine definition
  *

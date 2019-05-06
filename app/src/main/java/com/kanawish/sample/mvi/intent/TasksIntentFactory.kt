@@ -49,33 +49,19 @@ class TasksIntentFactory @Inject constructor(
     private fun buildReloadTasksIntent(): Intent<TasksState> {
         return intent {
             assert(syncState == SyncState.IDLE)
-            /*
-            fun retrofitSuccess(loadedTasks: List<Task>) = tasksModelStore.process(
-                intent {
-                    assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
-                    copy(tasks = loadedTasks, syncState = SyncState.IDLE)
-                }
-            )
-
-
-            fun retrofitError(throwable: Throwable) = tasksModelStore.process(
-                    intent {
-                        assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
-                        copy(syncState = SyncState.ERROR(throwable))
-                    }
-            )
-            */
-
 
             fun retrofitSuccess(loadedTasks: List<Task>) = chainedIntent {
                 assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
-                copy(tasks = loadedTasks, syncState = SyncState.IDLE)
+
+                copy(tasks = loadedTasks, syncState = (syncState as SyncState.PROCESS).success())
+//                copy(tasks = loadedTasks, syncState = SyncState.IDLE)
             }
 
 
             fun retrofitError(throwable: Throwable) = chainedIntent {
                 assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
-                copy(syncState = SyncState.ERROR(throwable))
+//                copy(syncState = SyncState.ERROR(throwable))
+                copy(syncState = (syncState as SyncState.PROCESS).failed())
             }
 
 
@@ -155,3 +141,20 @@ class TasksIntentFactory @Inject constructor(
         }
     }
 }
+
+/*
+           fun retrofitSuccess(loadedTasks: List<Task>) = tasksModelStore.process(
+               intent {
+                   assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
+                   copy(tasks = loadedTasks, syncState = SyncState.IDLE)
+               }
+           )
+
+
+           fun retrofitError(throwable: Throwable) = tasksModelStore.process(
+                   intent {
+                       assert(syncState is SyncState.PROCESS && syncState.type == SyncState.PROCESS.Type.REFRESH)
+                       copy(syncState = SyncState.ERROR(throwable))
+                   }
+           )
+           */

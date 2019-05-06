@@ -27,7 +27,7 @@ class TasksModelStoreTest {
 
     @Before
     fun setup(){
-        toothPickRule.inject(this)
+        toothPickRule.inject(this)  //  to build all annotated @Inject variables' instance, for example, tasksModelStore.
     }
 
     @Test
